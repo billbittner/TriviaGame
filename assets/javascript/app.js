@@ -101,10 +101,17 @@ var newQuestions = [];
 var timeLeft = 0;
 var questionCountDownInterval;
 var currentQuestion;
+var timeBetweenQuestions = 1000;
+var timeToGuess = 20;
+var correctQs = 0;
+var incorrectQs = 0;
+var unansweredQs = 0;
 
 function startGame() {
     //fill an array with potential questions
-    newQuestions = questionBank; 
+    for (var i = 0; i < questionBank.length; i++){
+        newQuestions.push(questionBank[i]);
+    } 
     //create the start button
     var startButton = $("<button>");
     startButton.addClass("button start-button");
@@ -172,7 +179,7 @@ function askQuestion() {
     $(".incorrect").on("click", incorrectAnswer);
 
     //set interval to count down
-    timeLeft = 30;
+    timeLeft = timeToGuess;
     questionCountDownInterval = setInterval(countDown, 1000);
     $("#time-left").html("Time Remaining: " + timeLeft);
 };
@@ -191,6 +198,8 @@ function countDown(){
 
 function correctAnswer(){
     console.log("correct answer!");
+    //
+    correctQs += 1;
     //clear contents
     clearContents();
     //turn off counter
@@ -211,6 +220,8 @@ function correctAnswer(){
 
 function incorrectAnswer(){
     console.log("wrong answer...")
+    //
+    incorrectQs += 1;
     //clear contents
     clearContents();
     //turn off counter
@@ -223,7 +234,7 @@ function incorrectAnswer(){
     var correctAnswer = $("<p></p>");
     correctAnswer.html("The correct answer is: " + currentQuestion.correctAnswer);
     correctAnswer.addClass("content-element");
-    correctAnswer.insertAfter($banner);
+    correctAnswer.insertAfter(banner);
     //display image of winning answer
     var img = $("<img>");
     img.attr("src", currentQuestion.imgSrc);
@@ -236,6 +247,8 @@ function incorrectAnswer(){
 
 function timesUp(){
     console.log("time ran out.")
+    //
+    unansweredQs += 1;
     //clear contents
     clearContents()
     //turn off counter
@@ -248,7 +261,7 @@ function timesUp(){
     var correctAnswer = $("<p></p>");
     correctAnswer.html("The correct answer was: " + currentQuestion.correctAnswer);
     correctAnswer.addClass("content-element");
-    correctAnswer.insertAfter($banner);
+    correctAnswer.insertAfter(banner);
     //display image of winning answer
     var img = $("<img>");
     img.attr("src", currentQuestion.imgSrc);
@@ -275,7 +288,7 @@ function clearTimer(){
 
 function nextQuestion(){
     //in 5 seconds, run "isGameOver" to decide next steps
-    setTimeout(isGameOver, 5000);
+    setTimeout(isGameOver, timeBetweenQuestions);
 };
 
 function isGameOver(){
@@ -286,13 +299,47 @@ function isGameOver(){
     //turn off counter
     if (newQuestions.length === 0){
         //restart game
-        startGame();
+        gameOver();
     } else {
         //next question
         askQuestion();
     };
 };
 
+function gameOver(){
+    //display the results
+    var resultsCorrect = $("<p>");
+    resultsCorrect.html("You got " + correctQs + " correct.")
+    resultsCorrect.addClass("content-element")
+    resultsCorrect.appendTo($("#content-area"));
+    //display correct answer
+    var resultsIncorrect = $("<p>");
+    resultsIncorrect.html("You got " + incorrectQs + " wrong.")
+    resultsIncorrect.addClass("content-element")
+    resultsIncorrect.insertAfter(resultsCorrect);
+    //display correct answer
+    var resultsUnanswered = $("<p>");
+    resultsUnanswered.html("You got " + unansweredQs + " correct.")
+    resultsUnanswered.addClass("content-element")
+    resultsUnanswered.insertAfter(resultsIncorrect);
 
+    //create restart game button
+    var restartButton = $("<button>");
+    restartButton.addClass("button restart-button");
+    restartButton.html("Start Over");
+    restartButton.on("click", function(){
+        console.log("restart button was clicked");
+        $(".restart-button").remove();
+        //reset variables
+        correctQs = 0;
+        incorrectQs = 0;
+        unansweredQs = 0;
+        startGame();
+    });
+    //place the start button in the page
+    restartButton.insertAfter(resultsUnanswered);
+};
+
+//run the game
 startGame();
 

@@ -21,7 +21,8 @@ h2, p {
 .button {
     color: blue;
 }
-.start-button {
+
+.start-button, .restart-button {
     margin: 30px;
 }
 
