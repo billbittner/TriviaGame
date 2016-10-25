@@ -19,7 +19,10 @@ var questionBank = [
                 text: "this is the correct answer",
                 isCorrect: true,
             }
-        ]            
+        ],
+        imgSrc: "assets/images/image1.jpg",
+        imgAlt: "question 1",
+        correctAnswer: "Wolf"          
     },
     {
         question: "This is question two. Answer me!",
@@ -40,7 +43,10 @@ var questionBank = [
                 text: "this is the correct answer",
                 isCorrect: true,
             }
-        ]            
+        ],
+        imgSrc: "assets/images/image2.jpg",
+        imgAlt: "question 2",
+        correctAnswer: "northern lights"              
     },
     {
         question: "This is question three. What is the answer?",
@@ -61,7 +67,10 @@ var questionBank = [
                 text: "this is the correct answer",
                 isCorrect: true,
             }
-        ]            
+        ],
+        imgSrc: "assets/images/image3.jpg",
+        imgAlt: "question 3",
+        correctAnswer: "oak tree"              
     },
     {
         question: "This is question four. Please, answer it?",
@@ -82,11 +91,13 @@ var questionBank = [
                 text: "this is the correct answer",
                 isCorrect: true,
             }
-        ]            
+        ],
+        imgSrc: "assets/images/image4.jpg",
+        imgAlt: "question 4",
+        correctAnswer: "polar bears"              
     }
 ];
 var newQuestions = [];
-var usedQuestions = [];
 var timeLeft = 0;
 var questionCountDownInterval;
 var currentQuestion;
@@ -112,7 +123,7 @@ function askQuestion() {
 
     //create timer text
     var timerText = $("<h2></h2>");
-    timerText.addClass("timer-elements");
+    timerText.addClass("timer-element");
     timerText.attr("id", "time-left");
     timerText.appendTo($("#timer-area"));
     console.log("timer text was created");
@@ -128,10 +139,12 @@ function askQuestion() {
     //create the question text
     var questionText = $("<h2></h2");
     questionText.html(currentQuestion.question);
+    questionText.addClass("content-element");
     questionText.appendTo($("#content-area"));
 
     //create an answer target div
     var answerTarget = $("<div>");
+    answerTarget.addClass("content-element");
     answerTarget.insertAfter(questionText);
     
     //create answers
@@ -145,16 +158,19 @@ function askQuestion() {
         answer.html(currentQuestion.answers[j].text);
         //assign classes
         if (currentQuestion.answers[j].isCorrect === true) {
-            answer.addClass("answer correct");
+            answer.addClass("content-element answer correct ");
         } else {
-            answer.addClass("answer incorrect");
+            answer.addClass("content-element answer incorrect");
         };
         //remove the answer you just chose from available answers
         currentQuestion.answers.splice(j, 1);
         //insert it into the html
         answer.insertAfter(answerTarget);
     };
-    
+    //create on-click events for correct and incorrect answers
+    $(".correct").on("click", correctAnswer);
+    $(".incorrect").on("click", incorrectAnswer);
+
     //set interval to count down
     timeLeft = 30;
     questionCountDownInterval = setInterval(countDown, 1000);
@@ -174,25 +190,108 @@ function countDown(){
 };
 
 function correctAnswer(){
+    console.log("correct answer!");
+    //clear contents
+    clearContents();
+    //turn off counter
+    clearInterval(questionCountDownInterval);
+    //display that player won
+    var banner = $("<h2>You are Correct!</h2>");
+    banner.addClass("content-element");
+    banner.appendTo($("#content-area"));
+    //display image of winning answer
+    var img = $("<img>");
+    img.attr("src", currentQuestion.imgSrc);
+    img.attr("alt", currentQuestion.imgAlt);
+    img.addClass("content-element image");
+    img.insertAfter(banner);
+    //set timer for next question
+    nextQuestion();
+};
 
-}
-
-function wrongAnswer(){
-
-}
+function incorrectAnswer(){
+    console.log("wrong answer...")
+    //clear contents
+    clearContents();
+    //turn off counter
+    clearInterval(questionCountDownInterval);
+    //display that player lost
+    var banner = $("<h2>You are wrong...</h2>");
+    banner.addClass("content-element")
+    banner.appendTo($("#content-area"));
+    //display correct answer
+    var correctAnswer = $("<p></p>");
+    correctAnswer.html("The correct answer is: " + currentQuestion.correctAnswer);
+    correctAnswer.addClass("content-element");
+    correctAnswer.insertAfter($banner);
+    //display image of winning answer
+    var img = $("<img>");
+    img.attr("src", currentQuestion.imgSrc);
+    img.attr("alt", currentQuestion.imgAlt);
+    img.addClass("content-element image");
+    img.insertAfter(correctAnswer);
+    //set timer for next question
+    nextQuestion();
+};
 
 function timesUp(){
+    console.log("time ran out.")
     //clear contents
     clearContents()
-    //display answer
-
-    //set time out
-}
+    //turn off counter
+    clearInterval(questionCountDownInterval);
+    //display that player lost
+    var banner = $("<h2>You ran out of time</h2>");
+    banner.addClass("content-element")
+    banner.appendTo($("#content-area"));
+    //display correct answer
+    var correctAnswer = $("<p></p>");
+    correctAnswer.html("The correct answer was: " + currentQuestion.correctAnswer);
+    correctAnswer.addClass("content-element");
+    correctAnswer.insertAfter($banner);
+    //display image of winning answer
+    var img = $("<img>");
+    img.attr("src", currentQuestion.imgSrc);
+    img.attr("alt", currentQuestion.imgAlt);
+    img.addClass("content-element image");
+    img.insertAfter(correctAnswer);
+    //set timer for next question
+    nextQuestion();
+};
 
 function clearContents(){
     //clear all the contents out
+    $(".content-element").each(function (){
+        $(this).remove();
+    });
+};
 
-}
+function clearTimer(){
+    //clear all the contents out
+    $(".timer-element").each(function (){
+        $(this).remove();
+    });
+};
+
+function nextQuestion(){
+    //in 5 seconds, run "isGameOver" to decide next steps
+    setTimeout(isGameOver, 5000);
+};
+
+function isGameOver(){
+    //clear contents
+    clearContents();
+    //clear timer
+    clearTimer();
+    //turn off counter
+    if (newQuestions.length === 0){
+        //restart game
+        startGame();
+    } else {
+        //next question
+        askQuestion();
+    };
+};
 
 
 startGame();

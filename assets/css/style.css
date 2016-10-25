@@ -10,11 +10,11 @@
     overflow: auto;
 }
 
-h1, h2 {
+h1 {
     line-height: 2;
 }
 
-p {
+h2, p {
     line-height: 1.5;
 }
 
@@ -23,4 +23,18 @@ p {
 }
 .start-button {
     margin: 30px;
+}
+
+.answer {
+    font-weight: bold;
+    color: purple;
+}
+.answer:hover {
+    color: blue;
+}
+
+.image {
+    width: 250px;
+    height: 200px;
+    margin: 30px 0px 30px 0px;
 }
