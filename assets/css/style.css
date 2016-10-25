@@ -1,0 +1,26 @@
+.main-content-wrapper {
+    width: 80%;
+    margin: auto;
+    background: yellow;
+    height: 100%;
+}
+
+#title-area, #timer-area, #content-area {
+    text-align: center;
+    overflow: auto;
+}
+
+h1, h2 {
+    line-height: 2;
+}
+
+p {
+    line-height: 1.5;
+}
+
+.button {
+    color: blue;
+}
+.start-button {
+    margin: 30px;
+}
