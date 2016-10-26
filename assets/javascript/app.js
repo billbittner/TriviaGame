@@ -319,7 +319,7 @@ function gameOver(){
     resultsIncorrect.insertAfter(resultsCorrect);
     //display correct answer
     var resultsUnanswered = $("<p>");
-    resultsUnanswered.html("You got " + unansweredQs + " correct.")
+    resultsUnanswered.html("You did not answer " + unansweredQs + " questions.")
     resultsUnanswered.addClass("content-element")
     resultsUnanswered.insertAfter(resultsIncorrect);
 
