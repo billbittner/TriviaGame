@@ -101,35 +101,59 @@ var newQuestions = [];
 var timeLeft = 0;
 var questionCountDownInterval;
 var currentQuestion;
-var timeBetweenQuestions = 1000;
-var timeToGuess = 20;
+var timeBetweenQuestions = 3000;
+var timeToGuess = 5;
 var correctQs = 0;
 var incorrectQs = 0;
 var unansweredQs = 0;
+
+function setupGame(){
+    //add functionality to the start button 
+    $(".start-button").on("click", function(){
+        console.log("start button was clicked");
+        //ask first queston
+        askQuestion();
+    });
+    //add funcationality to the restart button
+    $(".restart-button").on("click", function(){
+        console.log("restart button was clicked");
+        //reset variables
+        correctQs = 0;
+        incorrectQs = 0;
+        unansweredQs = 0;
+        //fill an array with potential questions
+        for (var i = 0; i < questionBank.length; i++){
+            newQuestions.push(questionBank[i]);
+        };
+        //hide the results area
+        $(".results-area").hide();
+        //ask first question
+        askQuestion();
+    });
+    //create on-click events for the answers
+    $(".answer").on("click", checkAnswer);
+};
 
 function startGame() {
     //fill an array with potential questions
     for (var i = 0; i < questionBank.length; i++){
         newQuestions.push(questionBank[i]);
-    } 
-    //show and hide the proper areas
+    };
+    //hide everything except the start
     $(".timer-area").hide();
     $(".question-area").hide();
     $(".answer-area").hide();
     $(".results-area").hide();
-    //add functionality to the on-click function 
-    $(".start-button").on("click", function(){
-        console.log("start button was clicked");
-        $(".start-button").remove();
-        askQuestion();
-    });
 };
 
 function askQuestion() {
     //show and hide the proper areas
     $(".timer-area").show();
     $(".start-area").hide();
+    console.log("start area hidden");
     $(".question-area").show();
+    //hid answer-area in case this is question 2, 3, 4 etc.
+    $(".answer-area").hide();
     
     //choose a question
     //pick a question in the new questions list.  note: list shoudl not be empty
@@ -143,13 +167,15 @@ function askQuestion() {
     $("#question-text").html(currentQuestion.question);
     
     //place the answers
-    $(".answer-one").html(currentQuestion.answers[0]);
-    $(".answer-two").html(currentQuestion.answers[1]);
-    $(".answer-three").html(currentQuestion.answers[2]);
-    $(".answer-four").html(currentQuestion.answers[3]);
-
-    //create on-click events for correct and incorrect answers
-    $(".answer").on("click", checkAnswer);
+    $(".answer-one").html(currentQuestion.answers[0].text);
+    $(".answer-two").html(currentQuestion.answers[1].text);
+    $(".answer-three").html(currentQuestion.answers[2].text);
+    $(".answer-four").html(currentQuestion.answers[3].text);
+    //add correct/incorrect to the answers
+    $(".answer-one").data("isCorrect", currentQuestion.answers[0].isCorrect);
+    $(".answer-two").data("isCorrect", currentQuestion.answers[1].isCorrect);
+    $(".answer-three").data("isCorrect", currentQuestion.answers[2].isCorrect);
+    $(".answer-four").data("isCorrect", currentQuestion.answers[3].isCorrect);
 
     //set interval to count down
     timeLeft = timeToGuess;
@@ -174,41 +200,35 @@ function checkAnswer(){
     //show or hide content
     $(".question-area").hide();
     $(".answer-area").show();
-
-    if (/*answer is correct*/){
+    //console log - this 
+    console.log("checking the answer of: " + $(this));
+    //turn off counter
+    clearInterval(questionCountDownInterval);
+    //display result depening on whether it was right or wrong
+    if ($(this).data("isCorrect") === true){
         console.log("correct answer!");
         //add to tally
         correctQs += 1;
-        //turn off counter
-        clearInterval(questionCountDownInterval);
         //display that player won
         $("#answer-result").html("You are correct!")
         //clear the answer text
         $("#answer-text").html("");
-        //display image of winning answer
-        var img = $("<img>");
-        img.attr("src", currentQuestion.imgSrc);
-        img.attr("alt", currentQuestion.imgAlt);
-        img.addClass("content-element image");
-        img.insertAfter(banner);
-        //set timer for next question
-        nextQuestion();
-    } else if (/*answer is incorrect*/){
+    } else if ($(this).data("isCorrect") === false){
         console.log("wrong answer...");
         //add to tally
         incorrectQs += 1;
-        //turn off counter
-        clearInterval(questionCountDownInterval);
         //display that player lost
         $("#answer-result").html("You are wrong...")
         //display correct answer
         $("#answer-text").html("The correct answer is: " + currentQuestion.correctAnswer);
-        //display image of winning answer
-        $("#answer-image").attr("src", currentQuestion.imgSrc);
-        $("#answer-image").attr("alt", currentQuestion.imgAlt);
-        //set timer for next question
-        nextQuestion();
-    }
+    } else {
+        alert("error: neither correct or incorrect"); //remove for productoin
+    };
+    //display image of winning answer
+    $("#answer-image").attr("src", currentQuestion.imgSrc);
+    $("#answer-image").attr("alt", currentQuestion.imgAlt);
+    //set timer for next question
+    setTimeout(isGameOver, timeBetweenQuestions);
 };
 
 function timesUp(){
@@ -220,7 +240,7 @@ function timesUp(){
     $(".answer-area").show();
     //turn off counter
     clearInterval(questionCountDownInterval);
-    //display that player lost
+    //display that player failed to answer
     $("#answer-result").html("You did not answer in time");
     //display correct answer
     $("#answer-text").html("The correct answer was: " + currentQuestion.correctAnswer);
@@ -228,25 +248,10 @@ function timesUp(){
     $("#answer-image").attr("src", currentQuestion.imgSrc);
     $("#answer-image").attr("alt", currentQuestion.imgAlt);
     //set timer for next question
-    nextQuestion();
-};
-
-function clearTimer(){
-    //clear all the contents out
-
-};
-
-function nextQuestion(){
-    //in 5 seconds, run "isGameOver" to decide next steps
     setTimeout(isGameOver, timeBetweenQuestions);
 };
 
 function isGameOver(){
-    //show hide contents
-    $(".answer-area").hide();
-    $(".results-area").show();
-    //clear timer
-    clearTimer();
     //turn off counter
     if (newQuestions.length === 0){
         //restart game
@@ -258,39 +263,19 @@ function isGameOver(){
 };
 
 function gameOver(){
+    //show hide contents
+    $(".answer-area").hide();
+    $(".results-area").show();
     //display the results
-    var resultsCorrect = $("<p>");
-    resultsCorrect.html("You got " + correctQs + " correct.")
-    resultsCorrect.addClass("content-element")
-    resultsCorrect.appendTo($("#content-area"));
+    $("#results-correct").html("You got " + correctQs + " correct.");
     //display correct answer
-    var resultsIncorrect = $("<p>");
-    resultsIncorrect.html("You got " + incorrectQs + " wrong.")
-    resultsIncorrect.addClass("content-element")
-    resultsIncorrect.insertAfter(resultsCorrect);
+    $("#results-incorrect").html("You got " + incorrectQs + " wrong.");
     //display correct answer
-    var resultsUnanswered = $("<p>");
-    resultsUnanswered.html("You did not answer " + unansweredQs + " questions.")
-    resultsUnanswered.addClass("content-element")
-    resultsUnanswered.insertAfter(resultsIncorrect);
-
-    //create restart game button
-    var restartButton = $("<button>");
-    restartButton.addClass("button restart-button");
-    restartButton.html("Start Over");
-    restartButton.on("click", function(){
-        console.log("restart button was clicked");
-        $(".restart-button").remove();
-        //reset variables
-        correctQs = 0;
-        incorrectQs = 0;
-        unansweredQs = 0;
-        startGame();
-    });
-    //place the start button in the page
-    restartButton.insertAfter(resultsUnanswered);
+    $("#results-unanswered").html("You did not answer " + unansweredQs + " questions.");
 };
 
+//set up the game 
+setupGame();
 //run the game
 startGame();
 

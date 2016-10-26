@@ -34,7 +34,7 @@ h2, p {
     color: blue;
 }
 
-.image {
+#answer-image {
     width: 250px;
     height: 200px;
     margin: 30px 0px 30px 0px;
