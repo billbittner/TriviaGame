@@ -112,28 +112,24 @@ function startGame() {
     for (var i = 0; i < questionBank.length; i++){
         newQuestions.push(questionBank[i]);
     } 
-    //create the start button
-    var startButton = $("<button>");
-    startButton.addClass("button start-button");
-    startButton.html("START");
-    startButton.on("click", function(){
+    //show and hide the proper areas
+    $(".timer-area").hide();
+    $(".question-area").hide();
+    $(".answer-area").hide();
+    $(".results-area").hide();
+    //add functionality to the on-click function 
+    $(".start-button").on("click", function(){
         console.log("start button was clicked");
         $(".start-button").remove();
         askQuestion();
     });
-    //place the start button in the page
-    startButton.appendTo("#content-area");
 };
 
 function askQuestion() {
-    //create all the page elements
-
-    //create timer text
-    var timerText = $("<h2></h2>");
-    timerText.addClass("timer-element");
-    timerText.attr("id", "time-left");
-    timerText.appendTo($("#timer-area"));
-    console.log("timer text was created");
+    //show and hide the proper areas
+    $(".timer-area").show();
+    $(".start-area").hide();
+    $(".question-area").show();
     
     //choose a question
     //pick a question in the new questions list.  note: list shoudl not be empty
@@ -144,39 +140,16 @@ function askQuestion() {
     newQuestions.splice(i, 1);
 
     //create the question text
-    var questionText = $("<h2></h2");
-    questionText.html(currentQuestion.question);
-    questionText.addClass("content-element");
-    questionText.appendTo($("#content-area"));
-
-    //create an answer target div
-    var answerTarget = $("<div>");
-    answerTarget.addClass("content-element");
-    answerTarget.insertAfter(questionText);
+    $("#question-text").html(currentQuestion.question);
     
-    //create answers
-    var numberOfAnswers = currentQuestion.answers.length;
-    for (i = 0; i < numberOfAnswers; i++){
-        //create the answer element
-        var answer = $("<p></p>");
-        //choose a random answer from the answers
-        var j = Math.floor(Math.random()*currentQuestion.answers.length);
-        //assign it text
-        answer.html(currentQuestion.answers[j].text);
-        //assign classes
-        if (currentQuestion.answers[j].isCorrect === true) {
-            answer.addClass("content-element answer correct ");
-        } else {
-            answer.addClass("content-element answer incorrect");
-        };
-        //remove the answer you just chose from available answers
-        currentQuestion.answers.splice(j, 1);
-        //insert it into the html
-        answer.insertAfter(answerTarget);
-    };
+    //place the answers
+    $(".answer-one").html(currentQuestion.answers[0]);
+    $(".answer-two").html(currentQuestion.answers[1]);
+    $(".answer-three").html(currentQuestion.answers[2]);
+    $(".answer-four").html(currentQuestion.answers[3]);
+
     //create on-click events for correct and incorrect answers
-    $(".correct").on("click", correctAnswer);
-    $(".incorrect").on("click", incorrectAnswer);
+    $(".answer").on("click", checkAnswer);
 
     //set interval to count down
     timeLeft = timeToGuess;
@@ -196,94 +169,71 @@ function countDown(){
     };
 };
 
-function correctAnswer(){
-    console.log("correct answer!");
-    //
-    correctQs += 1;
-    //clear contents
-    clearContents();
-    //turn off counter
-    clearInterval(questionCountDownInterval);
-    //display that player won
-    var banner = $("<h2>You are Correct!</h2>");
-    banner.addClass("content-element");
-    banner.appendTo($("#content-area"));
-    //display image of winning answer
-    var img = $("<img>");
-    img.attr("src", currentQuestion.imgSrc);
-    img.attr("alt", currentQuestion.imgAlt);
-    img.addClass("content-element image");
-    img.insertAfter(banner);
-    //set timer for next question
-    nextQuestion();
-};
+function checkAnswer(){
+    console.log("checking the answer!");
+    //show or hide content
+    $(".question-area").hide();
+    $(".answer-area").show();
 
-function incorrectAnswer(){
-    console.log("wrong answer...")
-    //
-    incorrectQs += 1;
-    //clear contents
-    clearContents();
-    //turn off counter
-    clearInterval(questionCountDownInterval);
-    //display that player lost
-    var banner = $("<h2>You are wrong...</h2>");
-    banner.addClass("content-element")
-    banner.appendTo($("#content-area"));
-    //display correct answer
-    var correctAnswer = $("<p></p>");
-    correctAnswer.html("The correct answer is: " + currentQuestion.correctAnswer);
-    correctAnswer.addClass("content-element");
-    correctAnswer.insertAfter(banner);
-    //display image of winning answer
-    var img = $("<img>");
-    img.attr("src", currentQuestion.imgSrc);
-    img.attr("alt", currentQuestion.imgAlt);
-    img.addClass("content-element image");
-    img.insertAfter(correctAnswer);
-    //set timer for next question
-    nextQuestion();
+    if (/*answer is correct*/){
+        console.log("correct answer!");
+        //add to tally
+        correctQs += 1;
+        //turn off counter
+        clearInterval(questionCountDownInterval);
+        //display that player won
+        $("#answer-result").html("You are correct!")
+        //clear the answer text
+        $("#answer-text").html("");
+        //display image of winning answer
+        var img = $("<img>");
+        img.attr("src", currentQuestion.imgSrc);
+        img.attr("alt", currentQuestion.imgAlt);
+        img.addClass("content-element image");
+        img.insertAfter(banner);
+        //set timer for next question
+        nextQuestion();
+    } else if (/*answer is incorrect*/){
+        console.log("wrong answer...");
+        //add to tally
+        incorrectQs += 1;
+        //turn off counter
+        clearInterval(questionCountDownInterval);
+        //display that player lost
+        $("#answer-result").html("You are wrong...")
+        //display correct answer
+        $("#answer-text").html("The correct answer is: " + currentQuestion.correctAnswer);
+        //display image of winning answer
+        $("#answer-image").attr("src", currentQuestion.imgSrc);
+        $("#answer-image").attr("alt", currentQuestion.imgAlt);
+        //set timer for next question
+        nextQuestion();
+    }
 };
 
 function timesUp(){
     console.log("time ran out.")
-    //
+    //add to tally
     unansweredQs += 1;
-    //clear contents
-    clearContents()
+    //show hide contents
+    $(".question-area").hide();
+    $(".answer-area").show();
     //turn off counter
     clearInterval(questionCountDownInterval);
     //display that player lost
-    var banner = $("<h2>You ran out of time</h2>");
-    banner.addClass("content-element")
-    banner.appendTo($("#content-area"));
+    $("#answer-result").html("You did not answer in time");
     //display correct answer
-    var correctAnswer = $("<p></p>");
-    correctAnswer.html("The correct answer was: " + currentQuestion.correctAnswer);
-    correctAnswer.addClass("content-element");
-    correctAnswer.insertAfter(banner);
+    $("#answer-text").html("The correct answer was: " + currentQuestion.correctAnswer);
     //display image of winning answer
-    var img = $("<img>");
-    img.attr("src", currentQuestion.imgSrc);
-    img.attr("alt", currentQuestion.imgAlt);
-    img.addClass("content-element image");
-    img.insertAfter(correctAnswer);
+    $("#answer-image").attr("src", currentQuestion.imgSrc);
+    $("#answer-image").attr("alt", currentQuestion.imgAlt);
     //set timer for next question
     nextQuestion();
 };
 
-function clearContents(){
-    //clear all the contents out
-    $(".content-element").each(function (){
-        $(this).remove();
-    });
-};
-
 function clearTimer(){
     //clear all the contents out
-    $(".timer-element").each(function (){
-        $(this).remove();
-    });
+
 };
 
 function nextQuestion(){
@@ -292,8 +242,9 @@ function nextQuestion(){
 };
 
 function isGameOver(){
-    //clear contents
-    clearContents();
+    //show hide contents
+    $(".answer-area").hide();
+    $(".results-area").show();
     //clear timer
     clearTimer();
     //turn off counter

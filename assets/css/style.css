@@ -5,7 +5,7 @@
     height: 100%;
 }
 
-#title-area, #timer-area, #content-area {
+.title-area, .timer-area, .content-area {
     text-align: center;
     overflow: auto;
 }
