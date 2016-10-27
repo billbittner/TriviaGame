@@ -13,96 +13,92 @@ var unansweredQs;
 
 var questionBank = [
     {
-        question: "This is question one. Now, what is the answer?",
+        question: "Who has the most home runs in history?",
         answers: [
             {
-                text: "this is wrong answer 1",
+                text: "Hank Aaron",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 2",
-                isCorrect: false,
-            },
-            {
-                text: "this is wrong answer 3",
-                isCorrect: false,
-            },
-            {
-                text: "this is the correct answer",
+                text: "Barry Bonds",
                 isCorrect: true,
+            },
+            {
+                text: "Babe Ruth",
+                isCorrect: false,
+            },
+            {
+                text: "Sammy Sosa",
+                isCorrect: false,
             }
         ],
-        imgSrc: "assets/images/image1.jpg",
-        imgAlt: "question 1"       
+        imgSrc: "assets/images/image1.jpg",    
     },
     {
-        question: "This is question two. Answer me!",
+        question: "Who threw the first perfect game?",
         answers: [
             {
-                text: "this is wrong answer 1",
+                text: "Cy Young",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 2",
+                text: "Monte Ward",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 3",
-                isCorrect: false,
-            },
-            {
-                text: "this is the correct answer",
+                text: "Lee Richmond",
                 isCorrect: true,
+            },
+            {
+                text: "Addie Joss",
+                isCorrect: false,
             }
         ],
-        imgSrc: "assets/images/image2.jpg",
-        imgAlt: "question 2"           
+        imgSrc: "assets/images/image2.jpg",          
     },
     {
-        question: "This is question three. What is the answer?",
+        question: "Who has stolen the most bases in his career?",
         answers: [
             {
-                text: "this is wrong answer 1",
+                text: "Lou Brock",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 2",
+                text: "Billy Hamilton",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 3",
+                text: "Ty Cobb",
                 isCorrect: false,
             },
             {
-                text: "this is the correct answer",
+                text: "Ricky Henderson",
                 isCorrect: true,
             }
         ],
-        imgSrc: "assets/images/image3.jpg",
-        imgAlt: "question 3"           
+        imgSrc: "assets/images/image3.jpg",         
     },
     {
-        question: "This is question four. Please, answer it?",
+        question: "Which basketball player also played in the big leagues?",
         answers: [
             {
-                text: "this is wrong answer 1",
+                text: "Karl Malone",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 2",
+                text: "Michael Jordan",
+                isCorrect: true,
+            },
+            {
+                text: "Larry Bird",
                 isCorrect: false,
             },
             {
-                text: "this is wrong answer 3",
-                isCorrect: false,
-            },
-            {
-                text: "this is the correct answer",
+                text: "Spud Webb",
                 isCorrect: true,
             }
         ],
-        imgSrc: "assets/images/image4.jpg",
-        imgAlt: "question 4"           
+        imgSrc: "assets/images/image4.jpg",          
     }
 ];
 
@@ -110,13 +106,11 @@ var questionBank = [
 function initializeGame(){
     //add on.click to the start button 
     $(".start-button").on("click", function(){
-        console.log("start button was clicked");
         //ask first queston
         startGame();
     });
     //add on.click to the restart button
     $(".restart-button").on("click", function(){
-        console.log("restart button was clicked");
         //restart game
         startGame();
     });
@@ -155,7 +149,7 @@ function shuffle(questionBankArray){
     var currentIndex = questionBankArray.length;
     var temporaryValue; 
     var randomIndex;
-    // While there remain elements to shuffle...
+    // shuffle all the questions in the array
     for (var i = 0; i < questionBankArray.length; i++){
         // Pick a remaining element...
         randomIndex = Math.floor(Math.random() * currentIndex);
@@ -165,7 +159,19 @@ function shuffle(questionBankArray){
         questionBankArray[currentIndex] = questionBankArray[randomIndex];
         questionBankArray[randomIndex] = temporaryValue;
     };
-    console.log("array is shuffled");
+    //shuffle all the answers in each quesion in the array
+    // currentIndex = questionBankArray[0].answers.length;
+    // for (var i = 0; i < questionBankArray.length; i++){
+    //     for (var j = 0; j < questionBankArray[i].answers.length; j++){
+    //         // Pick a remaining element...
+    //         randomIndex = Math.floor(Math.random() * currentIndex);
+    //         currentIndex -= 1;
+    //         // And swap it with the current element.
+    //         temporaryValue = questionBankArray[i].answers[currentIndex];
+    //         questionBankArray[i].answers[currentIndex] = questionBankArray[i].answers[randomIndex];
+    //         questionBankArray[i].answers[randomIndex] = temporaryValue;
+    //     };
+    // };
     return questionBankArray;
 }
 
@@ -211,7 +217,6 @@ function countDown(){
 
 //this function will be called if the player ran out of time on a question
 function timesUp(){
-    console.log("time ran out.")
     //add to tally
     unansweredQs += 1;
     //show hide contents
@@ -220,13 +225,14 @@ function timesUp(){
     //turn off counter
     clearInterval(questionCountDownInterval);
     //display that player failed to answer
+    $("#solution-result").css("color", "red")
     $("#solution-result").html("You did not answer in time");
     //display correct answer
     var correctAnswer = findCorrectAnswer(shuffledQuestions[currentQuestionIndex]);
-    $("#solution-text").html("The correct answer was: " + correctAnswer);
+    $("#solution-text").html("The correct answer was " + correctAnswer);
     //display image of winning answer
     $("#solution-image").attr("src", shuffledQuestions[currentQuestionIndex].imgSrc);
-    $("#solution-image").attr("alt", shuffledQuestions[currentQuestionIndex].imgAlt);
+    $("#solution-image").attr("alt", shuffledQuestions[currentQuestionIndex].correctAnswer);
     //set timer for next question
     setTimeout(nextQuestion, timeBetweenQuestions);
 }
@@ -246,34 +252,33 @@ function presentSolution(){
     //hide question content and show solution content
     $(".question-content").hide();
     $(".solution-content").show();
-    //console log - this 
-    console.log("checking the answer of: " + $(this));
     //turn off counter
     clearInterval(questionCountDownInterval);
+    //find the correct answer
+    var correctAnswer = findCorrectAnswer(shuffledQuestions[currentQuestionIndex]);
     //display result depening on whether it was right or wrong
     if ($(this).data("isCorrect") === true){
-        console.log("correct answer!");
         //add to tally
         correctQs += 1;
         //display that player won
+        $("#solution-result").css("color", "yellow")
         $("#solution-result").html("You are correct!")
         //clear the answer text
         $("#solution-text").html("");
     } else if ($(this).data("isCorrect") === false){
-        console.log("wrong answer...");
         //add to tally
         incorrectQs += 1;
         //display that player was wrong
+        $("#solution-result").css("color", "red")
         $("#solution-result").html("You are wrong...")
         //display correct answer
-        var correctAnswer = findCorrectAnswer(shuffledQuestions[currentQuestionIndex]);
-        $("#solution-text").html("The correct answer was: " + correctAnswer);
+        $("#solution-text").html("The correct answer was " + correctAnswer);
     } else {
         alert("error: neither correct or incorrect"); //remove for productoin
     };
     //display image of winning answer
     $("#solution-image").attr("src", shuffledQuestions[currentQuestionIndex].imgSrc);
-    $("#solution-image").attr("alt", shuffledQuestions[currentQuestionIndex].imgAlt);
+    $("#solution-image").attr("alt", shuffledQuestions[currentQuestionIndex].correctAnswer);
     //set timer for next question
     setTimeout(nextQuestion, timeBetweenQuestions);
 }

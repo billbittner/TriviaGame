@@ -1,7 +1,11 @@
+body {
+    background-image: url("../images/bg.jpg");
+}
+
 .main-content-wrapper {
-    width: 60%;
+    width: 800px;
     margin: auto;
-    background: yellow;
+    background: green;
     height: 500px; 
 }
 
@@ -11,39 +15,52 @@
 }
 
 .start-content {
-    background-color: orange;
     margin-top: 150px;
 }
 
-h1,h2, h3, p {
+h1 {
     line-height: 1.5;
+    font-size: 40px;
+    font-family: 'Bungee Shade', sans-serif;
+    color: white;
+}
+
+h2, h3, p {
+    font-weight: normal;
+    line-height: 1;
+    font-family: 'Fredoka One', sans-serif;
 }
 
 #question-text {
-    color: green;   
+    color: white;   
 }
 
 .button {
-    color: blue;
+    color: red;
+    background: white;
     margin: 30px;
 }
 
-.start-button {
+.button {
     width: 30%;
     height: 60px;
     font-size: xx-large;
 }
 
 .answer {
-    font-weight: bold;
-    color: purple;
+    line-height: 1.5;
+    color: black;
 }
 .answer:hover {
-    color: blue;
+    color: white;
 }
 
 #solution-image {
     width: 250px;
     height: 200px;
-    margin: 30px 0px 30px 0px;
+    margin: 15px 0px 30px 0px;
+}
+
+#game-over-text{
+    color: yellow;
 }
