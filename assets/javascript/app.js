@@ -3,7 +3,7 @@ var shuffledQuestions;
 var currentQuestionIndex;
 
 var timeBetweenQuestions = 3000;
-var totalTimeToGuess = 5;
+var totalTimeToGuess = 20;
 var timeLeft;
 var questionCountDownInterval;
 
