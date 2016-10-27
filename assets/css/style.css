@@ -1,11 +1,8 @@
-html, body {
-    height: 100%;
-}
 .main-content-wrapper {
-    width: 80%;
+    width: 60%;
     margin: auto;
     background: yellow;
-    height: 80%; 
+    height: 500px; 
 }
 
 .title-section, .content-section {
@@ -18,12 +15,12 @@ html, body {
     margin-top: 150px;
 }
 
-h1 {
-    line-height: 2;
+h1,h2, h3, p {
+    line-height: 1.5;
 }
 
-h2, p {
-    line-height: 1.5;
+#question-text {
+    color: green;   
 }
 
 .button {

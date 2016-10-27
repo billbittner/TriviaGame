@@ -1,4 +1,16 @@
 
+var shuffledQuestions;
+var currentQuestionIndex;
+
+var timeBetweenQuestions = 3000;
+var totalTimeToGuess = 5;
+var timeLeft;
+var questionCountDownInterval;
+
+var correctQs;
+var incorrectQs;
+var unansweredQs;
+
 var questionBank = [
     {
         question: "This is question one. Now, what is the answer?",
@@ -21,8 +33,7 @@ var questionBank = [
             }
         ],
         imgSrc: "assets/images/image1.jpg",
-        imgAlt: "question 1",
-        correctAnswer: "Wolf"          
+        imgAlt: "question 1"       
     },
     {
         question: "This is question two. Answer me!",
@@ -45,8 +56,7 @@ var questionBank = [
             }
         ],
         imgSrc: "assets/images/image2.jpg",
-        imgAlt: "question 2",
-        correctAnswer: "northern lights"              
+        imgAlt: "question 2"           
     },
     {
         question: "This is question three. What is the answer?",
@@ -69,8 +79,7 @@ var questionBank = [
             }
         ],
         imgSrc: "assets/images/image3.jpg",
-        imgAlt: "question 3",
-        correctAnswer: "oak tree"              
+        imgAlt: "question 3"           
     },
     {
         question: "This is question four. Please, answer it?",
@@ -93,52 +102,27 @@ var questionBank = [
             }
         ],
         imgSrc: "assets/images/image4.jpg",
-        imgAlt: "question 4",
-        correctAnswer: "polar bears"              
+        imgAlt: "question 4"           
     }
 ];
-var newQuestions = [];
-var timeLeft = 0;
-var questionCountDownInterval;
-var currentQuestion;
-var timeBetweenQuestions = 3000;
-var timeToGuess = 5;
-var correctQs = 0;
-var incorrectQs = 0;
-var unansweredQs = 0;
 
-function setupGame(){
-    //add functionality to the start button 
+//this function will setup and start the game for the first time
+function initializeGame(){
+    //add on.click to the start button 
     $(".start-button").on("click", function(){
         console.log("start button was clicked");
         //ask first queston
-        askQuestion();
+        startGame();
     });
-    //add funcationality to the restart button
+    //add on.click to the restart button
     $(".restart-button").on("click", function(){
         console.log("restart button was clicked");
-        //reset variables
-        correctQs = 0;
-        incorrectQs = 0;
-        unansweredQs = 0;
-        //fill an array with potential questions
-        for (var i = 0; i < questionBank.length; i++){
-            newQuestions.push(questionBank[i]);
-        };
-        //hide the results content
-        $(".results-content").hide();
-        //ask first question
-        askQuestion();
+        //restart game
+        startGame();
     });
-    //create on-click events for the answers
-    $(".answer").on("click", checkAnswer);
-}
+    //create on.click events for the answers
+    $(".answer").on("click", presentSolution);
 
-function startGame() {
-    //fill an array with potential questions
-    for (var i = 0; i < questionBank.length; i++){
-        newQuestions.push(questionBank[i]);
-    };
     //hide everything except the start
     $(".timer-content").hide();
     $(".question-content").hide();
@@ -146,43 +130,73 @@ function startGame() {
     $(".results-content").hide();
 }
 
-function askQuestion() {
-    //show and hide the proper content
-    $(".timer-content").show();
+//this function will start the game, or restart the game
+function startGame() {
+    //Shuffle the questions
+    shuffledQuestions = shuffle(questionBank);
+    //set the index of the current question
+    currentQuestionIndex = 0;
+    //reset variables
+    correctQs = 0;
+    incorrectQs = 0;
+    unansweredQs = 0;
+    //hide everything 
     $(".start-content").hide();
-    console.log("start content hidden");
-    $(".question-content").show();
-    //hid solution-content in case this is question 2, 3, 4 etc.
+    $(".timer-content").hide();
+    $(".question-content").hide();
     $(".solution-content").hide();
-    
-    //choose a question
-    //pick a question in the new questions list.  note: list shoudl not be empty
-    var i = Math.floor(Math.random()*newQuestions.length);
-    //move the question to a new variable
-    currentQuestion = newQuestions[i];
-    //remove the question from the array
-    newQuestions.splice(i, 1);
+    $(".results-content").hide();
+    //ask first question
+    askQuestion();
+}
 
+//this function will shuffle the question bank array so it is different each playthrough
+function shuffle(questionBankArray){
+    var currentIndex = questionBankArray.length;
+    var temporaryValue; 
+    var randomIndex;
+    // While there remain elements to shuffle...
+    for (var i = 0; i < questionBankArray.length; i++){
+        // Pick a remaining element...
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        // And swap it with the current element.
+        temporaryValue = questionBankArray[currentIndex];
+        questionBankArray[currentIndex] = questionBankArray[randomIndex];
+        questionBankArray[randomIndex] = temporaryValue;
+    };
+    console.log("array is shuffled");
+    return questionBankArray;
+}
+
+//this function will present the question and possible answers to the player
+function askQuestion() {
+    //show the timer and the question content
+    $(".timer-content").show();
+    $(".question-content").show();
+    
     //create the question text
-    $("#question-text").html(currentQuestion.question);
+    $("#question-text").html(shuffledQuestions[currentQuestionIndex].question);
     
     //place the answers
-    $(".answer-one").html(currentQuestion.answers[0].text);
-    $(".answer-two").html(currentQuestion.answers[1].text);
-    $(".answer-three").html(currentQuestion.answers[2].text);
-    $(".answer-four").html(currentQuestion.answers[3].text);
+    $(".answer-one").html(shuffledQuestions[currentQuestionIndex].answers[0].text);
+    $(".answer-two").html(shuffledQuestions[currentQuestionIndex].answers[1].text);
+    $(".answer-three").html(shuffledQuestions[currentQuestionIndex].answers[2].text);
+    $(".answer-four").html(shuffledQuestions[currentQuestionIndex].answers[3].text);
     //add correct/incorrect to the answers
-    $(".answer-one").data("isCorrect", currentQuestion.answers[0].isCorrect);
-    $(".answer-two").data("isCorrect", currentQuestion.answers[1].isCorrect);
-    $(".answer-three").data("isCorrect", currentQuestion.answers[2].isCorrect);
-    $(".answer-four").data("isCorrect", currentQuestion.answers[3].isCorrect);
+    $(".answer-one").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[0].isCorrect);
+    $(".answer-two").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[1].isCorrect);
+    $(".answer-three").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[2].isCorrect);
+    $(".answer-four").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[3].isCorrect);
 
-    //set interval to count down
-    timeLeft = timeToGuess;
+    //set count down timer
+    timeLeft = totalTimeToGuess;
     questionCountDownInterval = setInterval(countDown, 1000);
+    //display the timer
     $("#time-left").html("Time Remaining: " + timeLeft);
 }
 
+//this question will count down the timer while the question is presented
 function countDown(){
     //count down one second
     timeLeft--;
@@ -195,9 +209,41 @@ function countDown(){
     };
 }
 
-function checkAnswer(){
-    console.log("checking the answer!");
-    //show or hide content
+//this function will be called if the player ran out of time on a question
+function timesUp(){
+    console.log("time ran out.")
+    //add to tally
+    unansweredQs += 1;
+    //show hide contents
+    $(".question-content").hide();
+    $(".solution-content").show();
+    //turn off counter
+    clearInterval(questionCountDownInterval);
+    //display that player failed to answer
+    $("#solution-result").html("You did not answer in time");
+    //display correct answer
+    var correctAnswer = findCorrectAnswer(shuffledQuestions[currentQuestionIndex]);
+    $("#solution-text").html("The correct answer was: " + correctAnswer);
+    //display image of winning answer
+    $("#solution-image").attr("src", shuffledQuestions[currentQuestionIndex].imgSrc);
+    $("#solution-image").attr("alt", shuffledQuestions[currentQuestionIndex].imgAlt);
+    //set timer for next question
+    setTimeout(nextQuestion, timeBetweenQuestions);
+}
+
+//this function searches the current question object for the right answer
+function findCorrectAnswer(questionObject){
+    //loop through the answers and return the one that is correct
+    for (var i = 0; questionObject.answers.length; i++){
+        if (questionObject.answers[i].isCorrect === true){
+            return questionObject.answers[i].text;
+        };
+    };
+}
+
+//this function checks the clicked answer and presents the results 
+function presentSolution(){
+    //hide question content and show solution content
     $(".question-content").hide();
     $(".solution-content").show();
     //console log - this 
@@ -217,51 +263,38 @@ function checkAnswer(){
         console.log("wrong answer...");
         //add to tally
         incorrectQs += 1;
-        //display that player lost
+        //display that player was wrong
         $("#solution-result").html("You are wrong...")
         //display correct answer
-        $("#solution-text").html("The correct answer is: " + currentQuestion.correctAnswer);
+        var correctAnswer = findCorrectAnswer(shuffledQuestions[currentQuestionIndex]);
+        $("#solution-text").html("The correct answer was: " + correctAnswer);
     } else {
         alert("error: neither correct or incorrect"); //remove for productoin
     };
     //display image of winning answer
-    $("#solution-image").attr("src", currentQuestion.imgSrc);
-    $("#solution-image").attr("alt", currentQuestion.imgAlt);
+    $("#solution-image").attr("src", shuffledQuestions[currentQuestionIndex].imgSrc);
+    $("#solution-image").attr("alt", shuffledQuestions[currentQuestionIndex].imgAlt);
     //set timer for next question
-    setTimeout(isGameOver, timeBetweenQuestions);
+    setTimeout(nextQuestion, timeBetweenQuestions);
 }
 
-function timesUp(){
-    console.log("time ran out.")
-    //add to tally
-    unansweredQs += 1;
-    //show hide contents
-    $(".question-content").hide();
-    $(".solution-content").show();
-    //turn off counter
-    clearInterval(questionCountDownInterval);
-    //display that player failed to answer
-    $("#solution-result").html("You did not answer in time");
-    //display correct answer
-    $("#solution-text").html("The correct answer was: " + currentQuestion.correctAnswer);
-    //display image of winning answer
-    $("#solution-image").attr("src", currentQuestion.imgSrc);
-    $("#solution-image").attr("alt", currentQuestion.imgAlt);
-    //set timer for next question
-    setTimeout(isGameOver, timeBetweenQuestions);
-}
-
-function isGameOver(){
-    //turn off counter
-    if (newQuestions.length === 0){
+//this question moves to the next question if the game is not over
+function nextQuestion(){
+    //check to see if there are any questions left
+    if (currentQuestionIndex === (shuffledQuestions.length - 1)){
         //restart game
         gameOver();
     } else {
-        //next question
+        //increase the current question index
+        currentQuestionIndex += 1;
+        //hide solution-content
+        $(".solution-content").hide();
+        //ask next question
         askQuestion();
     };
 }
 
+//this function displays the results and the restart button
 function gameOver(){
     //show hide contents
     $(".solution-content").hide();
@@ -274,8 +307,6 @@ function gameOver(){
     $("#results-unanswered").html("You did not answer " + unansweredQs + " questions.");
 }
 
-//set up the game 
-setupGame();
 //run the game
-startGame();
+initializeGame();
 
