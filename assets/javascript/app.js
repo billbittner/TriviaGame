@@ -141,59 +141,49 @@ function startGame() {
     $(".solution-content").hide();
     $(".results-content").hide();
     //ask first question
-    askQuestion();
+    askQuestion(shuffledQuestions[currentQuestionIndex]);
 }
 
 //this function will shuffle the question bank array so it is different each playthrough
-function shuffle(questionBankArray){
-    var currentIndex = questionBankArray.length;
+function shuffle(questionBank){
+    var questions = [];
+    for (var i = 0; i < questionBank.length; i++){
+        questions.push(questionBank[i]);
+    }
+    var currentIndex = questions.length;
     var temporaryValue; 
     var randomIndex;
     // shuffle all the questions in the array
-    for (var i = 0; i < questionBankArray.length; i++){
+    for (var i = 0; i < questions.length; i++){
         // Pick a remaining element...
         randomIndex = Math.floor(Math.random() * currentIndex);
         currentIndex -= 1;
         // And swap it with the current element.
-        temporaryValue = questionBankArray[currentIndex];
-        questionBankArray[currentIndex] = questionBankArray[randomIndex];
-        questionBankArray[randomIndex] = temporaryValue;
+        temporaryValue = questions[currentIndex];
+        questions[currentIndex] = questions[randomIndex];
+        questions[randomIndex] = temporaryValue;
     };
-    //shuffle all the answers in each quesion in the array
-    // currentIndex = questionBankArray[0].answers.length;
-    // for (var i = 0; i < questionBankArray.length; i++){
-    //     for (var j = 0; j < questionBankArray[i].answers.length; j++){
-    //         // Pick a remaining element...
-    //         randomIndex = Math.floor(Math.random() * currentIndex);
-    //         currentIndex -= 1;
-    //         // And swap it with the current element.
-    //         temporaryValue = questionBankArray[i].answers[currentIndex];
-    //         questionBankArray[i].answers[currentIndex] = questionBankArray[i].answers[randomIndex];
-    //         questionBankArray[i].answers[randomIndex] = temporaryValue;
-    //     };
-    // };
-    return questionBankArray;
+    return questions;
 }
 
 //this function will present the question and possible answers to the player
-function askQuestion() {
+function askQuestion(currentQuestion) {
     //show the timer and the question content
     $(".timer-content").show();
     $(".question-content").show();
     
     //create the question text
-    $("#question-text").html(shuffledQuestions[currentQuestionIndex].question);
-    
+    $("#question-text").html(currentQuestion.question);
     //place the answers
-    $(".answer-one").html(shuffledQuestions[currentQuestionIndex].answers[0].text);
-    $(".answer-two").html(shuffledQuestions[currentQuestionIndex].answers[1].text);
-    $(".answer-three").html(shuffledQuestions[currentQuestionIndex].answers[2].text);
-    $(".answer-four").html(shuffledQuestions[currentQuestionIndex].answers[3].text);
-    //add correct/incorrect to the answers
-    $(".answer-one").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[0].isCorrect);
-    $(".answer-two").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[1].isCorrect);
-    $(".answer-three").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[2].isCorrect);
-    $(".answer-four").data("isCorrect", shuffledQuestions[currentQuestionIndex].answers[3].isCorrect);
+    $(".answer-one").html(currentQuestion.answers[0].text);
+    $(".answer-two").html(currentQuestion.answers[1].text);
+    $(".answer-three").html(currentQuestion.answers[2].text);
+    $(".answer-four").html(currentQuestion.answers[3].text);
+    //add correct/incorrect data to the answers
+    $(".answer-one").data("isCorrect", currentQuestion.answers[0].isCorrect);
+    $(".answer-two").data("isCorrect", currentQuestion.answers[1].isCorrect);
+    $(".answer-three").data("isCorrect", currentQuestion.answers[2].isCorrect);
+    $(".answer-four").data("isCorrect", currentQuestion.answers[3].isCorrect);
 
     //set count down timer
     timeLeft = totalTimeToGuess;
@@ -225,7 +215,7 @@ function timesUp(){
     //turn off counter
     clearInterval(questionCountDownInterval);
     //display that player failed to answer
-    $("#solution-result").css("color", "red")
+    $("#solution-result").css("color", "grey")
     $("#solution-result").html("You did not answer in time");
     //display correct answer
     var correctAnswer = findCorrectAnswer(shuffledQuestions[currentQuestionIndex]);
@@ -269,12 +259,10 @@ function presentSolution(){
         //add to tally
         incorrectQs += 1;
         //display that player was wrong
-        $("#solution-result").css("color", "red")
-        $("#solution-result").html("You are wrong...")
+        $("#solution-result").css("color", "orange")
+        $("#solution-result").html("That is not correct...")
         //display correct answer
-        $("#solution-text").html("The correct answer was " + correctAnswer);
-    } else {
-        alert("error: neither correct or incorrect"); //remove for productoin
+        $("#solution-text").html("The correct answer was " + correctAnswer + ".");
     };
     //display image of winning answer
     $("#solution-image").attr("src", shuffledQuestions[currentQuestionIndex].imgSrc);
@@ -295,7 +283,7 @@ function nextQuestion(){
         //hide solution-content
         $(".solution-content").hide();
         //ask next question
-        askQuestion();
+        askQuestion(shuffledQuestions[currentQuestionIndex]);
     };
 }
 
@@ -305,9 +293,9 @@ function gameOver(){
     $(".solution-content").hide();
     $(".results-content").show();
     //display the results
-    $("#results-correct").html("You got " + correctQs + " correct.");
+    $("#results-correct").html("You got " + correctQs + " questions correct.");
     //display correct answer
-    $("#results-incorrect").html("You got " + incorrectQs + " wrong.");
+    $("#results-incorrect").html("You got " + incorrectQs + " questions wrong.");
     //display correct answer
     $("#results-unanswered").html("You did not answer " + unansweredQs + " questions.");
 }
