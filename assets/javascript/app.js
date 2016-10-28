@@ -97,7 +97,7 @@ var questionBank = [
             },
             {
                 text: "Spud Webb",
-                isCorrect: true,
+                isCorrect: false,
             }
         ],
         imgSrc: "assets/images/image4.jpg",          
