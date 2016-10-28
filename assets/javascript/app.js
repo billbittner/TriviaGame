@@ -11,6 +11,8 @@ var correctQs;
 var incorrectQs;
 var unansweredQs;
 
+var audio = new Audio("assets/sounds/correct.wav");
+
 var questionBank = [
     {
         question: "Who has the most home runs in history?",
@@ -253,6 +255,8 @@ function presentSolution(){
         //display that player won
         $("#solution-result").css("color", "yellow")
         $("#solution-result").html("You are correct!")
+        //play winning sounds	
+        audio.play();
         //clear the answer text
         $("#solution-text").html("");
     } else if ($(this).data("isCorrect") === false){
